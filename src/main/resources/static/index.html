@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Siêu thị Mini (v20 - FINAL PRO)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .filter-box { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #dee2e6; }
+    </style>
+</head>
+<body class="bg-light">
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid"><a class="navbar-brand" href="#">🛒 Hệ thống Quản lý Siêu thị Mini - v20 (FINAL)</a></div>
+    </nav>
+
+    <div class="container mt-4 bg-white p-4 rounded shadow-sm">
+        
+        <ul class="nav nav-tabs mb-4" role="tablist">
+            <li class="nav-item"><button class="nav-link active fw-bold" data-bs-toggle="tab" data-bs-target="#tabTonKho">📦 SẢN PHẨM & KHO</button></li>
+            <li class="nav-item"><button class="nav-link fw-bold text-success" data-bs-toggle="tab" data-bs-target="#tabNhapKho">📥 NHẬP HÀNG</button></li>
+            <li class="nav-item"><button class="nav-link fw-bold text-danger" data-bs-toggle="tab" data-bs-target="#tabXuatKho">📤 XUẤT HÀNG</button></li>
+            <li class="nav-item"><button class="nav-link fw-bold text-info" data-bs-toggle="tab" data-bs-target="#tabNhanSu">👥 NHÂN SỰ</button></li>
+            <li class="nav-item"><button class="nav-link fw-bold text-primary" data-bs-toggle="tab" data-bs-target="#tabNhaCungCap">🏢 NHÀ CUNG CẤP</button></li>
+            <li class="nav-item"><button class="nav-link fw-bold text-warning" data-bs-toggle="tab" data-bs-target="#tabVanChuyen">🚚 VẬN CHUYỂN</button></li>
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="tabTonKho">
+                <div class="d-flex justify-content-between mb-3"><h4 class="text-primary">Danh mục Sản phẩm & Tồn kho</h4><button class="btn btn-primary" onclick="moCuaSoThemSanPham()">+ Thêm SP mới</button></div>
+                <div class="table-responsive"><table class="table table-bordered table-hover align-middle"><thead class="table-dark"><tr><th>Mã SP</th><th>Tên sản phẩm</th><th>Giá Nhập</th><th>Giá Bán</th><th>SL Tồn (DB)</th><th>Hành động</th></tr></thead><tbody id="bangTonKho"></tbody></table></div>
+            </div>
+
+            <div class="tab-pane fade" id="tabNhapKho">
+                <div class="d-flex justify-content-between mb-3"><h4 class="text-success">Lịch sử Nhập hàng (SQL Server)</h4><button class="btn btn-success" onclick="moCuaSoNhapKho()">+ Tạo Phiếu Nhập</button></div>
+                <div class="filter-box"><label class="form-label fw-bold small text-secondary">Tìm kiếm phiếu nhập</label><input type="text" class="form-control" id="timKiemNhap" placeholder="Nhập tên sản phẩm để lọc..." onkeyup="locDuLieuNhap()"></div>
+                <div class="table-responsive"><table class="table table-bordered align-middle"><thead class="table-success"><tr><th>Mã PN</th><th>Thời gian</th><th>Nhân viên</th><th>Nhà cung cấp</th><th>ĐV Vận Chuyển</th><th>Sản phẩm</th><th>Giá Nhập</th><th>Số lượng</th><th>Thành tiền</th></tr></thead><tbody id="bangNhapKho"></tbody></table></div>
+            </div>
+
+            <div class="tab-pane fade" id="tabXuatKho">
+                <div class="d-flex justify-content-between mb-3"><h4 class="text-danger">Lịch sử Xuất hàng (SQL Server)</h4><button class="btn btn-danger" onclick="moCuaSoXuatKho()">- Tạo Hóa Đơn Xuất</button></div>
+                <div class="filter-box"><label class="form-label fw-bold small text-secondary">Tìm kiếm hóa đơn</label><input type="text" class="form-control" id="timKiemXuat" placeholder="Nhập tên sản phẩm để lọc..." onkeyup="locDuLieuXuat()"></div>
+                <div class="table-responsive"><table class="table table-bordered align-middle"><thead class="table-danger"><tr><th>Mã HĐ</th><th>Thời gian</th><th>Thu ngân</th><th>Sản phẩm</th><th>Giá Bán</th><th>Số lượng</th><th>Thành tiền</th></tr></thead><tbody id="bangXuatKho"></tbody></table></div>
+            </div>
+
+            <div class="tab-pane fade" id="tabNhanSu"><div class="d-flex justify-content-between mb-3"><h4 class="text-info">Danh sách Nhân viên</h4><button class="btn btn-info text-white" onclick="moCuaSoThemNhanVien()">+ Thêm Nhân Viên</button></div><div class="table-responsive"><table class="table table-bordered table-hover align-middle"><thead class="table-dark"><tr><th>Mã NV</th><th>Tên nhân viên</th><th>Ngày sinh</th><th>Chức vụ</th><th>SĐT</th><th>Giới tính</th><th>Hành động</th></tr></thead><tbody id="bangNhanSu"></tbody></table></div></div>
+            
+            <div class="tab-pane fade" id="tabNhaCungCap"><div class="d-flex justify-content-between mb-3"><h4 class="text-primary">Danh sách Nhà Cung Cấp</h4><button class="btn btn-primary" onclick="moCuaSoDoiTac('NCC')">+ Thêm Nhà Cung Cấp</button></div><div class="table-responsive"><table class="table table-bordered table-hover align-middle"><thead class="table-dark"><tr><th>ID</th><th>Tên Công Ty</th><th>Số điện thoại</th><th>Địa chỉ</th><th>Hành động</th></tr></thead><tbody id="bangNhaCungCap"></tbody></table></div></div>
+            <div class="tab-pane fade" id="tabVanChuyen"><div class="d-flex justify-content-between mb-3"><h4 class="text-warning">Danh sách ĐV Vận Chuyển</h4><button class="btn btn-warning" onclick="moCuaSoDoiTac('DVVC')">+ Thêm ĐV Vận Chuyển</button></div><div class="table-responsive"><table class="table table-bordered table-hover align-middle"><thead class="table-dark"><tr><th>ID</th><th>Tên Đơn Vị</th><th>Số điện thoại</th><th>Địa chỉ</th><th>Hành động</th></tr></thead><tbody id="bangVanChuyen"></tbody></table></div></div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="cuaSoSanPham" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header bg-primary text-white"><h5>Sản phẩm</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="formNhapSanPham"><div class="mb-3"><label class="form-label">Mã SP (ID)</label><input type="text" class="form-control" id="maSP" required></div><div class="mb-3"><label class="form-label">Tên SP</label><input type="text" class="form-control" id="tenSP" required></div><div class="row"><div class="col-6 mb-3"><label class="form-label">Giá Nhập</label><input type="number" class="form-control" id="giaNhapSP" required></div><div class="col-6 mb-3"><label class="form-label">Giá Bán</label><input type="number" class="form-control" id="giaBanSP" required></div></div><div class="mb-3"><label class="form-label">Tồn Kho Ban Đầu</label><input type="number" class="form-control" id="soLuongSP" required></div><button type="button" class="btn btn-primary w-100" onclick="luuSanPham()">Lưu vào CSDL</button></form></div></div></div></div>
+    <div class="modal fade" id="cuaSoNhanVien" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header bg-info text-white"><h5>Thêm Nhân Viên</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="formNhapNhanVien"><div class="mb-3"><label class="form-label">Mã NV (ID)</label><input type="text" class="form-control" id="maNV" required></div><div class="mb-3"><label class="form-label">Tên NV</label><input type="text" class="form-control" id="tenNV" required></div><div class="row"><div class="col-6 mb-3"><label class="form-label">Ngày Sinh</label><input type="date" class="form-control" id="ngaySinhNV" required></div><div class="col-6 mb-3"><label class="form-label">Chức Vụ</label><input type="text" class="form-control" id="chucVuNV" required></div></div><div class="mb-3"><label class="form-label">SĐT</label><input type="text" class="form-control" id="sdtNV" required></div><div class="mb-3"><label class="form-label">Giới Tính</label><br><input type="radio" name="gioiTinh" value="Nam" checked> Nam &nbsp;&nbsp;<input type="radio" name="gioiTinh" value="Nữ"> Nữ</div><button type="button" class="btn btn-info w-100 text-white" onclick="luuNhanVien()">Lưu vào CSDL</button></form></div></div></div></div>
+    <div class="modal fade" id="cuaSoDoiTac" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header text-white" id="headerCuaSoDoiTac"><h5 id="tieuDeDoiTac">Đối tác</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="formNhapDoiTac"><input type="hidden" id="loaiCuaSoDoiTac"><div class="mb-3"><label class="form-label">ID / Mã số</label><input type="text" class="form-control" id="idDoiTac" required></div><div class="mb-3"><label class="form-label">Tên Công Ty/Đơn Vị</label><input type="text" class="form-control" id="tenDoiTac" required></div><div class="mb-3"><label class="form-label">SĐT</label><input type="text" class="form-control" id="sdtDoiTac" required></div><div class="mb-3"><label class="form-label">Địa Chỉ</label><input type="text" class="form-control" id="diachiDoiTac" required></div><button type="button" class="btn w-100" id="nutLuuDoiTac" onclick="luuDoiTac()">Lưu vào CSDL</button></form></div></div></div></div>
+    <div class="modal fade" id="cuaSoGiaoDich" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header text-white" id="phanDauGiaoDich"><h5 class="modal-title" id="tieuDeGiaoDich">Giao dịch</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="formGiaoDich"><input type="hidden" id="loaiGiaoDich"><div class="mb-3"><label class="form-label">Nhân viên thực hiện</label><select class="form-select" id="chonNhanVien"></select></div><div class="row"><div class="col-6 mb-3" id="vungNhaCungCap"><label class="form-label text-primary fw-bold">Nhà Cung Cấp</label><select class="form-select" id="chonNhaCungCap"></select></div><div class="col-6 mb-3" id="vungVanChuyen"><label class="form-label text-warning fw-bold">Vận Chuyển</label><select class="form-select" id="chonVanChuyen"></select></div></div><div class="mb-3"><label class="form-label fw-bold">Sản Phẩm</label><select class="form-select" id="chonSanPhamGiaoDich"></select></div><div class="mb-3"><label class="form-label">Số Lượng</label><input type="number" class="form-control" id="soLuongGiaoDich" min="1"></div><button type="button" class="btn w-100" id="nutGiaoDich" onclick="thucHienGiaoDich()">Xác nhận giao dịch</button></form></div></div></div></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let danhSachSanPham = [], danhSachNhanVien = [], danhSachNhaCungCap = [], danhSachVanChuyen = [];
+        let lichSuXuat = [], lichSuNhap = []; // Dữ liệu 100% từ DB
+
+        let modProduct, modTransaction, modEmployee, modPartner;
+
+        document.addEventListener("DOMContentLoaded", function() {
+            modProduct = new bootstrap.Modal(document.getElementById('cuaSoSanPham'));
+            modTransaction = new bootstrap.Modal(document.getElementById('cuaSoGiaoDich'));
+            modEmployee = new bootstrap.Modal(document.getElementById('cuaSoNhanVien'));
+            modPartner = new bootstrap.Modal(document.getElementById('cuaSoDoiTac'));
+            
+            taiTatCaDuLieuTuDB();
+        });
+
+        function taiTatCaDuLieuTuDB() {
+            taiSanPhamTuDB(); taiNhanVienTuDB(); taiDoiTacTuDB('nhacungcap', 'NCC'); taiDoiTacTuDB('vanchuyen', 'DVVC');
+            taiLichSuXuatTuDB(); taiLichSuNhapTuDB(); 
+        }
+
+        // --- TẢI API ---
+        async function taiSanPhamTuDB() { try { let res = await fetch('http://localhost:8080/api/sanpham'); danhSachSanPham = await res.json(); hienThiTonKho(); } catch (e) { console.error("Lỗi SP"); } }
+        async function taiNhanVienTuDB() { try { let res = await fetch('http://localhost:8080/api/nhanvien'); danhSachNhanVien = await res.json(); hienThiNhanSu(); } catch (e) { console.error("Lỗi NV"); } }
+        async function taiDoiTacTuDB(end, loai) { try { let res = await fetch(`http://localhost:8080/api/${end}`); let d = await res.json(); if(loai === 'NCC') danhSachNhaCungCap = d; else danhSachVanChuyen = d; hienThiDoiTac(loai); } catch (e) { console.error("Lỗi ĐT"); } }
+        async function taiLichSuXuatTuDB() { try { let res = await fetch('http://localhost:8080/api/giaodich/xuat'); lichSuXuat = await res.json(); hienThiXuatKho(lichSuXuat); } catch (e) { console.error("Lỗi HDX"); } }
+        async function taiLichSuNhapTuDB() { try { let res = await fetch('http://localhost:8080/api/giaodich/nhap'); lichSuNhap = await res.json(); hienThiNhapKho(lichSuNhap); } catch (e) { console.error("Lỗi HDN"); } }
+
+        // --- LƯU API ---
+        async function luuSanPham() { let ma = document.getElementById("maSP").value, ten = document.getElementById("tenSP").value, gn = Number(document.getElementById("giaNhapSP").value), gb = Number(document.getElementById("giaBanSP").value), sl = Number(document.getElementById("soLuongSP").value); if(!ma || !ten) return alert("Nhập đủ Mã và Tên!"); let spMoi = { id: ma, ten: ten, giaNhap: gn, giaBan: gb, tonKho: sl }; await fetch('http://localhost:8080/api/sanpham', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(spMoi) }); alert("Đã lưu!"); modProduct.hide(); taiSanPhamTuDB(); }
+        async function luuNhanVien() { let ma = document.getElementById("maNV").value, ten = document.getElementById("tenNV").value; if(!ma || !ten) return alert("Lỗi!"); let nvMoi = { id: ma, ten: ten, ngaySinh: document.getElementById("ngaySinhNV").value, chucVu: document.getElementById("chucVuNV").value, sdt: document.getElementById("sdtNV").value, gioiTinh: document.querySelector('input[name="gioiTinh"]:checked').value }; await fetch('http://localhost:8080/api/nhanvien', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(nvMoi) }); alert("Đã lưu!"); modEmployee.hide(); taiNhanVienTuDB(); }
+        async function luuDoiTac() { let loai = document.getElementById("loaiCuaSoDoiTac").value, endpoint = loai === 'NCC' ? 'nhacungcap' : 'vanchuyen'; let dtMoi = { id: document.getElementById("idDoiTac").value, ten: document.getElementById("tenDoiTac").value, sdt: document.getElementById("sdtDoiTac").value, diaChi: document.getElementById("diachiDoiTac").value }; await fetch(`http://localhost:8080/api/${endpoint}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dtMoi) }); alert("Đã lưu!"); modPartner.hide(); taiDoiTacTuDB(endpoint, loai); }
+
+        // --- XÓA API ---
+        async function xoaSanPham(id) { if(confirm("Xóa SP?")) { await fetch('http://localhost:8080/api/sanpham/' + id, {method: 'DELETE'}); taiSanPhamTuDB(); } }
+        async function xoaNhanVien(id) { if(confirm("Xóa Nhân Viên?")) { await fetch('http://localhost:8080/api/nhanvien/' + id, {method: 'DELETE'}); taiNhanVienTuDB(); } }
+        async function xoaDoiTac(loai, id) { if(confirm("Xóa Đối Tác?")) { let endpoint = loai === 'NCC' ? 'nhacungcap' : 'vanchuyen'; await fetch(`http://localhost:8080/api/${endpoint}/` + id, {method: 'DELETE'}); taiDoiTacTuDB(endpoint, loai); } }
+
+        // --- RENDER BẢNG ---
+        function hienThiTonKho() { document.getElementById("bangTonKho").innerHTML = danhSachSanPham.map(sp => `<tr><td class="fw-bold">${sp.id}</td><td>${sp.ten}</td><td>${sp.giaNhap?.toLocaleString()}đ</td><td>${sp.giaBan?.toLocaleString()}đ</td><td class="fw-bold text-primary fs-5">${sp.tonKho || 0}</td><td><button class="btn btn-sm btn-danger" onclick="xoaSanPham('${sp.id}')">Xóa</button></td></tr>`).join(''); }
+        function hienThiNhapKho(data) { document.getElementById("bangNhapKho").innerHTML = data.map(p => `<tr><td class="fw-bold text-secondary">PN${p.id}</td><td>${p.thoiGian}</td><td>${p.nhanVien}</td><td>${p.nhaCungCap}</td><td>${p.vanChuyen}</td><td class="fw-bold">${p.tenSanPham}</td><td>${p.giaNhap?.toLocaleString()||0}đ</td><td class="text-success fw-bold">+${p.soLuong}</td><td class="fw-bold text-success">${p.thanhTien?.toLocaleString()||0}đ</td></tr>`).join(''); }
+        function hienThiXuatKho(data) { document.getElementById("bangXuatKho").innerHTML = data.map(p => `<tr><td class="fw-bold text-secondary">HDX${p.id}</td><td>${p.thoiGian}</td><td>${p.nhanVien}</td><td class="fw-bold">${p.tenSanPham}</td><td>${p.giaBan?.toLocaleString()||0}đ</td><td class="text-danger fw-bold">-${p.soLuong}</td><td class="fw-bold text-primary">${p.thanhTien?.toLocaleString()||0}đ</td></tr>`).join(''); }
+        function hienThiNhanSu() { document.getElementById("bangNhanSu").innerHTML = danhSachNhanVien.map(nv => `<tr><td class="fw-bold">${nv.id}</td><td>${nv.ten}</td><td>${nv.ngaySinh || ''}</td><td>${nv.chucVu || ''}</td><td>${nv.sdt || ''}</td><td>${nv.gioiTinh || ''}</td><td><button class="btn btn-sm btn-danger" onclick="xoaNhanVien('${nv.id}')">Xóa</button></td></tr>`).join(''); }
+        function hienThiDoiTac(loai) { let m = loai==='NCC'?danhSachNhaCungCap:danhSachVanChuyen; let id = loai==='NCC'?"bangNhaCungCap":"bangVanChuyen"; document.getElementById(id).innerHTML = m.map(d => `<tr><td class="fw-bold">${d.id}</td><td>${d.ten}</td><td>${d.sdt || ''}</td><td>${d.diaChi || ''}</td><td><button class="btn btn-sm btn-danger" onclick="xoaDoiTac('${loai}', '${d.id}')">Xóa</button></td></tr>`).join(''); }
+
+        function locDuLieuNhap() { let k=document.getElementById("timKiemNhap").value.toLowerCase(); hienThiNhapKho(lichSuNhap.filter(p=>p.tenSanPham.toLowerCase().includes(k)||p.nhaCungCap.toLowerCase().includes(k))); }
+        function locDuLieuXuat() { let k=document.getElementById("timKiemXuat").value.toLowerCase(); hienThiXuatKho(lichSuXuat.filter(p=>p.tenSanPham.toLowerCase().includes(k))); }
+
+        // --- MỞ CỬA SỔ GIAO DỊCH ---
+        function moCuaSoThemSanPham() { document.getElementById("formNhapSanPham").reset(); modProduct.show(); }
+        function moCuaSoThemNhanVien() { document.getElementById("formNhapNhanVien").reset(); modEmployee.show(); }
+        function moCuaSoDoiTac(loai) { document.getElementById("formNhapDoiTac").reset(); document.getElementById("loaiCuaSoDoiTac").value=loai; document.getElementById("tieuDeDoiTac").innerText=loai==='NCC'?"Thêm NCC":"Thêm DVVC"; modPartner.show(); }
+
+        function moCuaSoNhapKho() { chuanBiCuaSoGiaoDich("nhap", "Nhập Hàng", "bg-success", "btn-success"); }
+        function moCuaSoXuatKho() { chuanBiCuaSoGiaoDich("xuat", "Xuất Hàng", "bg-danger", "btn-danger"); }
+
+        function chuanBiCuaSoGiaoDich(loai, tieuDe, mauNen, nutClass) {
+            document.getElementById("formGiaoDich").reset();
+            document.getElementById("loaiGiaoDich").value = loai;
+            document.getElementById("tieuDeGiaoDich").innerText = tieuDe;
+            document.getElementById("phanDauGiaoDich").className = `modal-header text-white ${mauNen}`;
+            document.getElementById("vungNhaCungCap").style.display = loai==='nhap'?'block':'none';
+            document.getElementById("vungVanChuyen").style.display = loai==='nhap'?'block':'none';
+            
+            document.getElementById("chonNhanVien").innerHTML = danhSachNhanVien.map(nv => `<option value="${nv.ten}">${nv.ten}</option>`).join('');
+            document.getElementById("chonNhaCungCap").innerHTML = danhSachNhaCungCap.map(dt => `<option value="${dt.ten}">${dt.ten}</option>`).join('');
+            document.getElementById("chonVanChuyen").innerHTML = danhSachVanChuyen.map(dt => `<option value="${dt.ten}">${dt.ten}</option>`).join('');
+            document.getElementById("chonSanPhamGiaoDich").innerHTML = danhSachSanPham.map(sp => `<option value="${sp.id}">${sp.id} - ${sp.ten} (Tồn: ${sp.tonKho || 0})</option>`).join('');
+            modTransaction.show();
+        }
+
+        // --- XỬ LÝ GIAO DỊCH CHÍNH THỨC ---
+        async function thucHienGiaoDich() {
+            let loai = document.getElementById("loaiGiaoDich").value;
+            let ma = document.getElementById("chonSanPhamGiaoDich").value;
+            let sl = Number(document.getElementById("soLuongGiaoDich").value);
+            let nv = document.getElementById("chonNhanVien").value;
+            let now = new Date().toLocaleString('vi-VN');
+
+            if (sl <= 0) return alert("Số lượng phải lớn hơn 0!");
+
+            try {
+                if (loai === "nhap") {
+                    let res = await fetch(`http://localhost:8080/api/giaodich/nhap`, { 
+                        method: 'POST', headers: { 'Content-Type': 'application/json' }, 
+                        body: JSON.stringify({ 
+                            maSP: ma, soLuong: sl.toString(), nhanVien: nv, thoiGian: now,
+                            nhaCungCap: document.getElementById("chonNhaCungCap").value,
+                            vanChuyen: document.getElementById("chonVanChuyen").value
+                        }) 
+                    });
+                    if (!res.ok) throw new Error("Giao dịch nhập thất bại!");
+                    await taiLichSuNhapTuDB(); // Kéo phiếu nhập mới từ SQL lên
+                } else {
+                    let res = await fetch(`http://localhost:8080/api/giaodich/xuat`, { 
+                        method: 'POST', headers: { 'Content-Type': 'application/json' }, 
+                        body: JSON.stringify({ maSP: ma, soLuong: sl.toString(), nhanVien: nv, thoiGian: now }) 
+                    });
+                    if (!res.ok) throw new Error("Giao dịch thất bại! Kho không đủ hàng!");
+                    await taiLichSuXuatTuDB(); // Kéo hóa đơn xuất mới từ SQL lên
+                }
+                
+                alert("Giao dịch thành công!");
+                modTransaction.hide();
+                await taiSanPhamTuDB(); // Load lại để cập nhật Tồn Kho mới nhất
+                
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+    </script>
+</body>
+</html>
