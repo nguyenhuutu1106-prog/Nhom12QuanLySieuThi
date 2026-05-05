@@ -1,66 +1,93 @@
--- NHÓM 1: QUẢN LÝ KHO & SẢN PHẨM
-
-SELECT * FROM mat_hang ORDER BY ten ASC;
-
--- Câu 1: Cảnh báo hàng tồn kho thấp (Tồn kho dưới 10) để kịp thời nhập thêm
-SELECT id, ten, ton_kho FROM mat_hang WHERE ton_kho < 10;
-
--- Câu 2: Lọc ra các sản phẩm cao cấp có giá bán lớn hơn 100.000 VNĐ
-SELECT ten, gia_ban FROM mat_hang WHERE gia_ban > 100000;
-
--- Câu 3: Tìm kiếm nhanh các mặt hàng theo từ khóa (Ví dụ: Tìm tất cả các loại "Sữa")
-SELECT * FROM mat_hang WHERE ten LIKE N'%Sữa%';
-
--- Câu 4: Tính trung bình cộng giá bán của tất cả các mặt hàng đang kinh doanh
-SELECT AVG(gia_ban) AS GiaBanTrungBinh FROM mat_hang;
-
--- NHÓM 2: THỐNG KÊ DOANH THU & LỢI NHUẬN
-
--- Câu 5: Tính tổng doanh thu thu được từ tất cả các hóa đơn bán ra
-SELECT SUM(thanh_tien) AS TongDoanhThu FROM hoa_don_xuat;
-
--- Câu 6: Tính tổng chi phí vốn đã bỏ ra để nhập hàng về kho
-SELECT SUM(thanh_tien) AS TongChiPhiNhapHang FROM hoa_don_nhap;
-
--- Câu 7: Tính toán mức biên độ lợi nhuận trên từng đơn vị sản phẩm (Giá bán - Giá nhập)
-SELECT ten AS TenSanPham, gia_nhap, gia_ban, (gia_ban - gia_nhap) AS LoiNhuanTren1SP 
-FROM mat_hang;
-
--- Câu 8: Trích xuất 5 hóa đơn bán hàng có giá trị cao nhất (Khách VIP)
-SELECT TOP 5 * FROM hoa_don_xuat ORDER BY thanh_tien DESC;
-
--- NHÓM 3: ĐÁNH GIÁ NHÂN VIÊN & ĐỐI TÁC
-
--- Câu 9: Thống kê KPI - Đếm số lượng hóa đơn mỗi nhân viên thu ngân đã xử lý
-SELECT nhan_vien, COUNT(id) AS SoDonDaBan 
-FROM hoa_don_xuat 
-GROUP BY nhan_vien;
-
--- Câu 10: Tra cứu thông tin của các nhân viên Nam đang giữ chức vụ 'Quản lý'
-SELECT ten, sdt FROM nhan_vien 
-WHERE gioi_tinh = N'Nam' AND chuc_vu = N'Quản lý';
-
--- Câu 11: Tìm kiếm các Nhà cung cấp có trụ sở tại TP HCM và số điện thoại đuôi '22'
-SELECT ten, sdt, dia_chi FROM nha_cung_cap 
-WHERE dia_chi LIKE N'%TP HCM%' AND sdt LIKE '%22';
-
--- NHÓM 4: TRUY VẤN NÂNG CAO (GỘP BẢNG, TÌM KIẾM SÂU)
--- -------------------------------------------------------
-
--- Câu 12: Truy xuất mặt hàng "Best Seller" (Bán được tổng số lượng nhiều nhất)
-SELECT TOP 1 ten_san_pham, SUM(so_luong) AS TongSoLuongDaBan
-FROM hoa_don_xuat
-GROUP BY ten_san_pham
+1. Truy vấn thông tin chi tiết nhân sự
+Câu lệnh này dùng để xuất danh sách nhân viên với đầy đủ các thuộc tính quan trọng như ngày sinh, giới tính và số điện thoại để kiểm tra hồ sơ.
+SELECT 
+    [manv], 
+    [tennv], 
+    [chucvu], 
+    [gioitinh], 
+    [ngaysinh], 
+    [sdt] 
+FROM [QuanLySieuThi].[dbo].[nhanvien];
+2. Lọc các mặt hàng sắp hết tồn kho
+Giúp người quản lý biết được mặt hàng nào có số lượng tồn kho dưới 55 để lên kế hoạch nhập thêm.
+SELECT 
+    [id] AS MaSanPham, 
+    [ten] AS TenSanPham, 
+    [tonkho] AS SoLuongTon 
+FROM [QuanLySieuThi].[dbo].[mathang]
+WHERE [tonkho] < 55;
+3. Tính toán tiền lãi dự kiến cho từng sản phẩm
+Sử dụng phép trừ giữa giá bán và giá nhập để tính ra mức lợi nhuận thu được trên mỗi đơn vị sản phẩm.
+SELECT 
+    [id], 
+    [ten], 
+    [gia_nhap], 
+    [gia_ban], 
+    ([gia_ban] - [gia_nhap]) AS TienLai 
+FROM [QuanLySieuThi].[dbo].[mathang];
+4. Tìm kiếm nhà cung cấp theo khu vực
+Sử dụng từ khóa LIKE để lọc ra tất cả các nhà cung cấp có địa chỉ nằm tại Hà Nội.
+SELECT 
+    [id], 
+    [ten], 
+    [diachi], 
+    [sdt] 
+FROM [QuanLySieuThi].[dbo].[nha_cung_cap]
+WHERE [diachi] LIKE N'%Hà Nội%';
+5. Thống kê tổng doanh thu theo từng nhân viên bán hàng
+Sử dụng hàm gộp SUM() và GROUP BY để xem nhân viên nào mang lại nhiều doanh thu nhất từ bảng hóa đơn xuất.
+SELECT 
+    [nhan_vien] AS TenNhanVien, 
+    COUNT([id]) AS SoLuongDonHang,
+    SUM([thanh_tien]) AS TongDoanhThu 
+FROM [QuanLySieuThi].[dbo].[hoa_don_xuat]
+GROUP BY [nhan_vien];
+6. Xem chi tiết các đơn nhập hàng có giá trị lớn (Trên 2 triệu)
+Lọc các hóa đơn nhập có tổng thành tiền lớn hơn 2.000.000 VNĐ và sắp xếp từ cao xuống thấp.
+SELECT 
+    [id], 
+    [ten_san_pham], 
+    [nha_cung_cap], 
+    [so_luong], 
+    [thanh_tien], 
+    [thoi_gian] 
+FROM [QuanLySieuThi].[dbo].[hoa_don_nhap]
+WHERE [thanh_tien] > 2000000
+ORDER BY [thanh_tien] DESC;
+7. Liệt kê tài khoản kèm theo chức vụ của nhân viên (Dùng JOIN)
+Kết nối bảng tai_khoan và nhanvien thông qua mã nhân viên (manv) để biết tài khoản nào thuộc về ai và giữ chức vụ gì.
+SELECT 
+    tk.[ten_dang_nhap], 
+    tk.[vai_tro], 
+    nv.[tennv], 
+    nv.[chucvu] 
+FROM [QuanLySieuThi].[dbo].[tai_khoan] tk
+JOIN [QuanLySieuThi].[dbo].[nhanvien] nv ON tk.[manv] = nv.[manv];
+8. Thống kê tổng số lượng đã bán của từng mặt hàng
+Nhóm dữ liệu theo tên sản phẩm trong bảng xuất hàng để biết sản phẩm nào đang bán chạy nhất.
+SELECT 
+    [ten_san_pham], 
+    SUM([so_luong]) AS TongSoLuongDaBan 
+FROM [QuanLySieuThi].[dbo].[hoa_don_xuat]
+GROUP BY [ten_san_pham]
 ORDER BY TongSoLuongDaBan DESC;
-
--- Câu 13: Thống kê tổng số tiền đã thanh toán cho từng Nhà cung cấp
-SELECT nha_cung_cap, SUM(thanh_tien) AS TongTienDaNhap
-FROM hoa_don_nhap
-GROUP BY nha_cung_cap
-ORDER BY TongTienDaNhap DESC;
-
--- Câu 14: Tìm các sản phẩm "Ế" (Đang nằm trong kho nhưng chưa từng được xuất bán)
-SELECT id, ten, ton_kho FROM mat_hang 
-WHERE ten NOT IN (
-    SELECT DISTINCT ten_san_pham FROM hoa_don_xuat
-);
+9. Lấy ra hóa đơn xuất gần đây nhất
+Sử dụng TOP 1 và sắp xếp thời gian giảm dần (DESC) để lấy ra giao dịch bán hàng mới nhất của siêu thị.
+SELECT TOP 1 
+    [id], 
+    [ten_san_pham], 
+    [nhan_vien], 
+    [so_luong], 
+    [thanh_tien], 
+    [thoi_gian] 
+FROM [QuanLySieuThi].[dbo].[hoa_don_xuat]
+ORDER BY [thoi_gian] DESC;
+10. Tra cứu các đơn vị vận chuyển hỗ trợ giao hàng nội bộ
+Kiểm tra xem đơn vị vận chuyển nào có tên chứa chữ "nội bộ" để phân bổ việc giao nhận cho các hóa đơn nhập hàng.
+SELECT 
+    [id], 
+    [ten], 
+    [diachi], 
+    [sdt] 
+FROM [QuanLySieuThi].[dbo].[don_vi_van_chuyen]
+WHERE [ten] LIKE N'%nội bộ%';
